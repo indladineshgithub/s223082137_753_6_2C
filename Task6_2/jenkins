@@ -1,0 +1,82 @@
+pipeline {
+    agent any
+    
+    environment {
+        DIRECTORY_PATH = '/path/folder/code'
+        TESTING_ENVIRONMENT = 'QA test1_environment'
+        PRODUCTION_ENVIRONMENT = 'Dinesh'
+    }
+    
+    stages {
+        stage('Build') {
+            steps {
+                echo "Compiling the code and generating necessary artifacts and using build tools like maven and Gradle"
+                git branch: 'main', url: 'https://github.com/indladineshgithub/s223082137_753_6_2C'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo " For running tests we can use tools like Selenium , webdriver.io, jmeter for performance tests"
+            }
+            post {
+                success {
+                    emailext (
+                        to: 'indladineshreddy@gmail.com',
+                        subject: "Testing of latest commit  on : Pipeline ${currentBuild.fullDisplayName} ",
+                        body: "Testing of  ${env.TESTING_ENVIRONMENT} in ${currentBuild.fullDisplayName} has completed. \n\n Check console output at: ${env.BUILD_URL}", 
+                        attachLog: true
+                    )
+                }
+                failure {
+                    emailext (
+                        to: 'indladineshreddy@gmail.com',
+                        subject: "Testing of latest commite: Pipeline ${currentBuild.fullDisplayName}",
+                        body: "Testing of latest commit ${env.TESTING_ENVIRONMENT} in ${currentBuild.fullDisplayName} has failed.",
+                        attachLog: true
+                    )
+                }
+            }
+        }
+        stage('Code Analysis') {
+            steps {
+                echo "Checking the quality of the code and this is done by tools like SonarQube, ESLint"
+            }
+        }
+        stage('Security Scan') {
+            steps {
+                echo "Security scan is used for scanning code for potential vulnerabilities and tools are Acunetix, Burp Suite "
+            }
+			post {
+                success {
+                    emailext (
+                        to: 'indladineshreddy@gmail.com',
+                        subject: "Security scan is completed: Pipeline ${currentBuild.fullDisplayName}",
+                        body: "Security scan in   in ${currentBuild.fullDisplayName} has completed . \n\n Check console output at: ${env.BUILD_URL}", 
+                        attachLog: true
+                    )
+                }
+                failure {
+                    emailext (
+                        to: 'indladineshreddy@gmail.com',
+                        subject: "Security scan failure: Pipeline ${currentBuild.fullDisplayName}",
+                        body: "Security scan in ${currentBuild.fullDisplayName} has failed.",
+                        attachLog: true
+                    )
+                }
+            }
+        }
+        stage('Integration Tests') {
+            steps {
+                script {
+                    echo "This is to check on how the system is performing when system are integrated and tools are postman , Junit  "
+                    sleep time: 10, unit: 'SECONDS'
+                }
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                echo "Deploying the code to production servers and server instance like AWS EC2, AZure , GCP  " 
+            }
+        }
+    }
+}
